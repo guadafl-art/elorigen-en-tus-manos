@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e0e10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="El Origen">
+<meta name="description" content="Un viaje táctil por la evolución humana">
+<title>El Origen en Tus Manos</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifest = {
+  name: "El Origen en Tus Manos",
+  short_name: "El Origen",
+  description: "Un viaje táctil por la evolución humana",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#0e0e10",
+  theme_color: "#f5c820",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%230e0e10'/><text y='130' x='96' text-anchor='middle' font-size='100'>🦴</text></svg>", sizes: "192x192", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel = 'manifest'; link.href = url;
+document.currentScript.parentNode.appendChild(link);
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0e0e10;
+  --bg2: #16161a;
+  --bg3: #1e1e24;
+  --gold: #f5c820;
+  --gold2: #ffd84d;
+  --text: #f0ede6;
+  --muted: #888;
+  --dim: #444;
+  --border: #2a2a2a;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(20px);
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+/* ══════════════════ SPLASH ══════════════════ */
+#splash {
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1.5rem;
+  padding-top: calc(var(--safe-top) + 2rem);
+}
+
+.splash-skull {
+  font-size: 80px;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(245,200,32,0.3));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.splash-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: #0e0e10;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 2px;
+}
+
+.splash-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 9vw, 3.5rem);
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+
+.splash-sub {
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.splash-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.splash-btn {
+  background: var(--gold);
+  color: #0e0e10;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Source Sans 3', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: transform 0.15s, background 0.2s;
+  box-shadow: 0 0 30px rgba(245,200,32,0.25);
+}
+.splash-btn:active { transform: scale(0.96); background: var(--gold2); }
+
+.install-hint {
+  font-size: 11px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ══════════════════ HOME (lista homos) ══════════════════ */
+#home {
+  padding-top: var(--safe-top);
+  overflow: hidden;
+}
+
+.home-header {
+  padding: 1.2rem 1.4rem 0.8rem;
+  flex-shrink: 0;
+}
+
+.home-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1.1;
+}
+.home-sub {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.progress-bar {
+  height: 2px;
+  background: var(--border);
+  margin: 0.8rem 1.4rem 0;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.section-label {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0.8rem 1.4rem 0.4rem;
+  flex-shrink: 0;
+}
+
+.homo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.homo-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.homo-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: 2px 0 0 2px;
+  transition: background 0.2s;
+}
+.homo-item:active { transform: scale(0.98); }
+.homo-item.visited { border-color: #333; }
+.homo-item.visited::before { background: var(--gold); }
+
+.item-emoji {
+  font-size: 38px;
+  flex-shrink: 0;
+  width: 52px;
+  text-align: center;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1px;
+}
+.item-nick {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.item-era {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.item-badge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.badge-pill {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chevron {
+  color: var(--dim);
+  font-size: 18px;
+}
+
+/* ══════════════════ DETAIL ══════════════════ */
+#detail {
+  padding-top: var(--safe-top);
+  overflow: hidden;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.4rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.back-btn {
+  width: 36px; height: 36px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  color: var(--text);
+}
+.back-btn:active { background: var(--bg3); }
+
+.detail-header-info { flex: 1; min-width: 0; }
+.detail-header-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-header-era { font-size: 11px; color: var(--muted); }
+
+.detail-emoji-big {
+  font-size: 36px;
+  filter: drop-shadow(0 0 8px rgba(245,200,32,0.2));
+}
+
+.detail-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-hero {
+  padding: 1.5rem 1.4rem 1rem;
+  background: linear-gradient(180deg, rgba(245,200,32,0.05) 0%, transparent 100%);
+}
+
+.detail-nick {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.detail-desc {
+  font-size: 15px;
+  color: #bbb;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+.dtag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.dtag.gold { border-color: var(--gold); color: var(--gold); background: rgba(245,200,32,0.07); }
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+.fact-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem;
+}
+.fact-label { font-size: 10px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.fact-val { font-size: 13px; color: var(--text); font-weight: 600; line-height: 1.3; }
+
+.section-divider {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0 1.4rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.content-block {
+  margin: 0 1rem 0.8rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.block-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.9rem 1rem 0.6rem;
+}
+
+.block-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: rgba(245,200,32,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.block-meta { flex: 1; }
+.block-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.block-subtitle { font-size: 11px; color: var(--muted); }
+
+.block-text {
+  padding: 0 1rem 0.9rem;
+  font-size: 14px;
+  color: #aaa;
+  line-height: 1.65;
+}
+
+/* Audio player */
+.audio-wrap {
+  padding: 0 1rem 1rem;
+}
+
+.audio-player {
+  background: #0e0e10;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ap-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ap-play {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: #0e0e10;
+  transition: transform 0.15s, background 0.2s;
+}
+.ap-play:active { transform: scale(0.92); }
+.ap-play.playing { background: var(--gold2); }
+
+.ap-info { flex: 1; }
+.ap-name { font-size: 13px; color: var(--text); font-weight: 600; }
+.ap-dur { font-size: 11px; color: var(--muted); }
+
+.waveform-vis {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.wv-bar {
+  flex: 1;
+  border-radius: 2px;
+  background: #2a2a2a;
+  min-width: 2px;
+  transition: background 0.1s;
+  cursor: pointer;
+}
+.wv-bar.played { background: var(--gold); }
+.wv-bar.current { background: var(--gold2); }
+
+.ap-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Nav dots */
+.nav-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 1rem;
+  flex-shrink: 0;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.nav-dot.active { background: var(--gold); transform: scale(1.3); }
+
+.nav-arrows {
+  display: flex;
+  gap: 8px;
+  padding: 0 1rem 1rem;
+  flex-shrink: 0;
+}
+.nav-arrow {
+  flex: 1;
+  padding: 0.7rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Source Sans 3', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.nav-arrow.primary { background: rgba(245,200,32,0.1); border-color: rgba(245,200,32,0.3); color: var(--gold); }
+.nav-arrow:active { background: var(--bg3); }
+.nav-arrow:disabled { opacity: 0.3; pointer-events: none; }
+
+/* ══════════════════ CREDITS ══════════════════ */
+.credits-footer {
+  padding: 1.5rem 1.4rem calc(var(--safe-bottom) + 1rem);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+.credits-motto {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.5px;
+}
+
+/* ══ scrollbar hide ══ */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+/* ══ install prompt ══ */
+#installBanner {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 1rem);
+  left: 1rem; right: 1rem;
+  background: #1a1a10;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#installBanner.show { display: flex; }
+.install-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.install-text strong { color: var(--gold); }
+.install-actions { display: flex; gap: 8px; }
+.inst-yes {
+  flex: 1;
+  background: var(--gold);
+  color: #0e0e10;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Source Sans 3', sans-serif;
+  cursor: pointer;
+}
+.inst-no {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Source Sans 3', sans-serif;
+  cursor: pointer;
+}
+
+/* ══ Ios install hint ══ */
+#iosHint {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 1rem);
+  left: 1rem; right: 1rem;
+  background: #1a1a10;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999;
+}
+#iosHint.show { display: flex; }
+.ios-steps { font-size: 13px; color: #aaa; line-height: 1.8; }
+.ios-steps strong { color: var(--gold); }
+.ios-close {
+  align-self: flex-end;
+  background: var(--gold);
+  color: #0e0e10;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH ══ -->
+<div class="screen active" id="splash">
+  <div class="splash-skull">🦴</div>
+  <div class="splash-badge">Museo Interactivo · DUA</div>
+  <div class="splash-title">El Origen<br>en Tus Manos</div>
+  <div class="splash-sub">La evolución humana</div>
+  <div class="splash-quote">"La evolución no es una carrera, es un viaje."</div>
+  <button class="splash-btn" onclick="goHome()">Comenzar el viaje →</button>
+  <div class="install-hint" id="installHint" style="display:none">
+    📲 <span>Instala la app para usarla sin conexión</span>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="screen" id="home">
+  <div class="home-header">
+    <div class="home-title">El Origen<br>en Tus Manos</div>
+    <div class="home-sub">Selecciona un homínido para explorar</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="section-label">5 homínidos · Toca para explorar</div>
+  <div class="homo-list" id="homoList"></div>
+</div>
+
+<!-- ══ DETAIL ══ -->
+<div class="screen" id="detail">
+  <div class="detail-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="detail-header-info">
+      <div class="detail-header-name" id="dhName">—</div>
+      <div class="detail-header-era" id="dhEra">—</div>
+    </div>
+    <div class="detail-emoji-big" id="dhEmoji"></div>
+  </div>
+  <div class="detail-scroll" id="detailScroll">
+    <!-- filled by JS -->
+  </div>
+  <div class="nav-dots" id="navDots"></div>
+  <div class="nav-arrows">
+    <button class="nav-arrow" id="btnPrev" onclick="navigate(-1)">← Anterior</button>
+    <button class="nav-arrow primary" id="btnNext" onclick="navigate(1)">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ══ INSTALL BANNER (Android/Chrome) ══ -->
+<div id="installBanner">
+  <div class="install-text"><strong>📲 Instalar la app</strong><br>Añade El Origen a tu pantalla de inicio para usarla sin conexión en cualquier momento.</div>
+  <div class="install-actions">
+    <button class="inst-yes" id="installBtn">Instalar ahora</button>
+    <button class="inst-no" onclick="dismissInstall()">Ahora no</button>
+  </div>
+</div>
+
+<!-- ══ IOS HINT ══ -->
+<div id="iosHint">
+  <div class="install-text"><strong>📲 Instalar en iPhone/iPad</strong></div>
+  <div class="ios-steps">
+    1. Toca el botón <strong>Compartir ⬆</strong> en Safari<br>
+    2. Selecciona <strong>"Añadir a pantalla de inicio"</strong><br>
+    3. Pulsa <strong>Añadir</strong> — ¡listo!
+  </div>
+  <button class="ios-close" onclick="document.getElementById('iosHint').classList.remove('show')">Entendido</button>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  CONTENIDO — Edita aquí los textos y audios
+// ════════════════════════════════════════════
+// Para añadir audio: pon la URL directa al .mp3 en el campo "audio"
+// Puedes usar URLs de Google Drive, Dropbox u otro hosting
+// Deja audio:null si solo hay texto
+
+const HOMOS = [
+  {
+    id: 0,
+    name: "Australopithecus",
+    nickname: "Los primeros pasos",
+    era: "4–2 millones de años",
+    emoji: "🦴",
+    color: "#2d1e08",
+    tags: ["Bípedo", "África Oriental", "Cerebro pequeño"],
+    goldTag: "Bípedo",
+    description: "El Australopithecus fue uno de los primeros homínidos en caminar erguido sobre dos pies, aunque compartía muchas características con los simios. Su cerebro era pequeño pero su bipedestación liberó las manos para nuevas funciones.",
+    facts: [
+      { label: "Volumen craneal", val: "400–500 cm³" },
+      { label: "Altura media", val: "1,0–1,5 m" },
+      { label: "Dieta", val: "Omnívora" },
+      { label: "Región", val: "África Oriental" },
+    ],
+    contenidos: [
+      {
+        tipo: "texto",
+        titulo: "¿Quién era el Australopithecus?",
+        subtitulo: "Descripción general",
+        icono: "📖",
+        texto: "Vivió hace entre 4 y 2 millones de años en el este de África. A pesar de tener un cerebro pequeño, su capacidad de caminar en dos patas fue una revolución evolutiva. Los restos más famosos son los de \"Lucy\", hallada en Etiopía en 1974.",
+        audio: null,
+        audioNombre: null
+      },
+      {
+        tipo: "audio",
+        titulo: "Historia: Los primeros pasos",
+        subtitulo: "Narración del panel táctil",
+        icono: "🎧",
+        texto: "Aquí escucharás la historia narrada del Australopithecus tal como se presenta en el panel táctil del museo. Escanea el QR físico o escucha directamente.",
+        audio: null, // ← Pon aquí la URL del audio: "https://tu-host.com/australopithecus.mp3"
+        audioNombre: "Historia en audio"
+      },
+      {
+        tipo: "texto",
+        titulo: "El objeto táctil: guijarro tallado",
+        subtitulo: "Lo que puedes tocar en el panel",
+        icono: "🪨",
+        texto: "El guijarro tallado representa la herramienta más primitiva asociada a este período. No era fabricada por el Australopithecus sino recogida de la naturaleza: una piedra con borde natural que servía para romper huesos y acceder al tuétano.",
+        audio: null,
+        audioNombre: null
+      }
+    ]
+  },
+  {
+    id: 1,
+    name: "Homo Habilis",
+    nickname: "Las primeras herramientas",
+    era: "2,4–1,4 millones de años",
+    emoji: "🪨",
+    color: "#142908",
+    tags: ["Herramientas líticas", "Olduvai", "Carroñero"],
+    goldTag: "Herramientas",
+    description: "Homo Habilis fue el primer miembro reconocido del género Homo. Su nombre significa \"hombre hábil\" por ser el primer homínido en fabricar herramientas de piedra de forma sistemática.",
+    facts: [
+      { label: "Volumen craneal", val: "510–680 cm³" },
+      { label: "Altura media", val: "1,0–1,5 m" },
+      { label: "Tecnología", val: "Olduvayense" },
+      { label: "Hallazgo", val: "Garganta de Olduvai" },
+    ],
+    contenidos: [
+      {
+        tipo: "texto",
+        titulo: "El primer fabricante de herramientas",
+        subtitulo: "Descripción general",
+        icono: "📖",
+        texto: "Hace 2,4 millones de años, en la Garganta de Olduvai (Tanzania), un homínido diferente empezó a golpear piedras deliberadamente para crear bordes cortantes. Esta industria lítica, llamada Olduvayense, marcó el inicio de la tecnología humana.",
+        audio: null,
+        audioNombre: null
+      },
+      {
+        tipo: "audio",
+        titulo: "Historia: Las primeras herramientas",
+        subtitulo: "Narración del panel táctil",
+        icono: "🎧",
+        texto: "Escucha la narración completa sobre cómo el Homo Habilis transformó el mundo con sus manos y su ingenio.",
+        audio: null, // ← URL del audio aquí
+        audioNombre: "Historia en audio"
+      },
+      {
+        tipo: "texto",
+        titulo: "El objeto táctil: lasca de piedra",
+        subtitulo: "Lo que puedes tocar en el panel",
+        icono: "🪨",
+        texto: "La lasca de piedra que encontrarás en el panel es una réplica de una herramienta Olduvayense. Observa el borde cortante: este filo fue creado golpeando dos piedras entre sí, un proceso llamado talla por percusión.",
+        audio: null,
+        audioNombre: null
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: "Homo Erectus",
+    nickname: "Domina el fuego",
+    era: "1,9 millones – 150.000 años",
+    emoji: "🔥",
+    color: "#2e1500",
+    tags: ["Fuego", "Migración", "Achelense"],
+    goldTag: "Fuego",
+    description: "Homo Erectus fue el primer homínido en abandonar África y colonizar Asia y Europa. Su dominio del fuego cambió radicalmente la alimentación, la sociedad y el paisaje nocturno del planeta.",
+    facts: [
+      { label: "Volumen craneal", val: "750–1.250 cm³" },
+      { label: "Altura media", val: "1,4–1,8 m" },
+      { label: "Tecnología", val: "Achelense" },
+      { label: "Distribución", val: "África, Asia, Europa" },
+    ],
+    contenidos: [
+      {
+        tipo: "texto",
+        titulo: "El gran viajero del Pleistoceno",
+        subtitulo: "Descripción general",
+        icono: "📖",
+        texto: "Homo Erectus cruzó el continente africano y llegó a Java y China hace más de un millón de años. Con una morfología más cercana a la nuestra, cazaba en grupo, cocinaba alimentos sobre el fuego y fabricaba hachas de mano perfectamente simétricas.",
+        audio: null,
+        audioNombre: null
+      },
+      {
+        tipo: "audio",
+        titulo: "Historia: Domina el fuego",
+        subtitulo: "Narración del panel táctil",
+        icono: "🎧",
+        texto: "Escucha cómo el Homo Erectus transformó el mundo al dominar el fuego, la primera gran tecnología de la humanidad.",
+        audio: null, // ← URL del audio aquí
+        audioNombre: "Historia en audio"
+      },
+      {
+        tipo: "texto",
+        titulo: "El objeto táctil: madera quemada",
+        subtitulo: "Lo que puedes tocar en el panel",
+        icono: "🔥",
+        texto: "El trozo de madera quemada del panel evoca el primer hogar controlado. El fuego no solo cocinaba: calentaba, protegía de depredadores, extendía el día más allá del ocaso y reunía al grupo. Fue la primera tecnología social de la humanidad.",
+        audio: null,
+        audioNombre: null
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: "Neandertal",
+    nickname: "Adaptación y cultura",
+    era: "400.000 – 40.000 años",
+    emoji: "🐻",
+    color: "#12162e",
+    tags: ["Enterramientos", "Europa", "ADN compartido"],
+    goldTag: "Cultura",
+    description: "El Neandertal fue nuestro pariente más cercano: fuerte, inteligente, adaptado al frío glacial. Enterraba a sus muertos, usaba pigmentos y convivió con el Homo Sapiens. Llevamos hasta un 4% de su ADN.",
+    facts: [
+      { label: "Volumen craneal", val: "1.200–1.750 cm³" },
+      { label: "Altura media", val: "1,5–1,7 m" },
+      { label: "ADN en sapiens", val: "1–4%" },
+      { label: "Extinción", val: "Hace ~40.000 años" },
+    ],
+    contenidos: [
+      {
+        tipo: "texto",
+        titulo: "Nuestros primos del hielo",
+        subtitulo: "Descripción general",
+        icono: "📖",
+        texto: "Durante las glaciaciones europeas, el Neandertal desarrolló un cuerpo robusto y un cerebro igual o mayor que el nuestro. Fabricaba ropa con pieles, enterraba a sus muertos con flores y ocre, y posiblemente tenía lenguaje. Su extinción, hace 40.000 años, es aún un misterio.",
+        audio: null,
+        audioNombre: null
+      },
+      {
+        tipo: "audio",
+        titulo: "Historia: Adaptación y cultura",
+        subtitulo: "Narración del panel táctil",
+        icono: "🎧",
+        texto: "Descubre la historia del Neandertal, el homínido que rompió todos los estereotipos sobre la inteligencia primitiva.",
+        audio: null, // ← URL del audio aquí
+        audioNombre: "Historia en audio"
+      },
+      {
+        tipo: "texto",
+        titulo: "El objeto táctil: piel sintética",
+        subtitulo: "Lo que puedes tocar en el panel",
+        icono: "🐻",
+        texto: "La piel sintética del panel representa la confección de ropa, una adaptación crucial al clima glacial. Estudios recientes demuestran que el Neandertal usaba herramientas específicas para raspar y curtir pieles animales, creando prendas ajustadas al cuerpo.",
+        audio: null,
+        audioNombre: null
+      }
+    ]
+  },
+  {
+    id: 4,
+    name: "Homo Sapiens",
+    nickname: "Lenguaje y arte",
+    era: "200.000 años – hoy",
+    emoji: "🎨",
+    color: "#2e2600",
+    tags: ["Arte rupestre", "Lenguaje simbólico", "Tecnología"],
+    goldTag: "Arte",
+    description: "Nosotros. Homo Sapiens surgió en África hace 200.000 años y colonizó todo el planeta. El lenguaje simbólico, el arte y la cooperación a gran escala nos hicieron únicos entre todos los seres vivos.",
+    facts: [
+      { label: "Volumen craneal", val: "1.200–1.700 cm³" },
+      { label: "Aparición", val: "Hace 200.000 años" },
+      { label: "Población actual", val: "~8.100 millones" },
+      { label: "Origen", val: "África subsahariana" },
+    ],
+    contenidos: [
+      {
+        tipo: "texto",
+        titulo: "El animal que cuenta historias",
+        subtitulo: "Descripción general",
+        icono: "📖",
+        texto: "Hace 40.000 años, las cuevas de Europa empezaron a llenarse de pinturas. Homo Sapiens no solo fabricaba herramientas: construía narrativas, religiones, música, ciencia. Somos la única especie que se pregunta de dónde viene. Esta exposición es la prueba.",
+        audio: null,
+        audioNombre: null
+      },
+      {
+        tipo: "audio",
+        titulo: "Historia: Lenguaje y arte",
+        subtitulo: "Narración del panel táctil",
+        icono: "🎧",
+        texto: "La historia de cómo nuestra especie llegó a dominar el planeta gracias al lenguaje, el arte y la cooperación social.",
+        audio: null, // ← URL del audio aquí
+        audioNombre: "Historia en audio"
+      },
+      {
+        tipo: "texto",
+        titulo: "El objeto táctil: herramienta de hueso",
+        subtitulo: "Lo que puedes tocar en el panel",
+        icono: "🎨",
+        texto: "La herramienta de hueso pulido del panel pertenece al Paleolítico Superior. A diferencia de la piedra, el hueso permite formas más delicadas: agujas, anzuelos, arpones. Cada pieza era única y, a veces, decorada — el arte y la función unidos por primera vez.",
+        audio: null,
+        audioNombre: null
+      }
+    ]
+  }
+];
+
+// ════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════
+let currentHomo = 0;
+let visited = new Set();
+let audioElements = {};
+let playingAudioId = null;
+let waveAnimFrame = null;
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  stopAllAudio();
+  updateProgress();
+  showScreen('home');
+}
+
+function openHomo(idx) {
+  currentHomo = idx;
+  visited.add(idx);
+  updateProgress();
+  renderDetail(idx);
+  document.getElementById('detailScroll').scrollTop = 0;
+  showScreen('detail');
+}
+
+function navigate(dir) {
+  const next = currentHomo + dir;
+  if (next >= 0 && next < HOMOS.length) openHomo(next);
+}
+
+function updateProgress() {
+  const pct = (visited.size / HOMOS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  // Update visited state on list items
+  document.querySelectorAll('.homo-item').forEach((el, i) => {
+    el.classList.toggle('visited', visited.has(i));
+  });
+}
+
+// ════════════════════════════════════════════
+//  RENDER HOME LIST
+// ════════════════════════════════════════════
+function renderHome() {
+  const list = document.getElementById('homoList');
+  list.innerHTML = HOMOS.map((h, i) => `
+    <div class="homo-item ${visited.has(i)?'visited':''}" onclick="openHomo(${i})">
+      <div class="item-emoji">${h.emoji}</div>
+      <div class="item-info">
+        <div class="item-name">${h.name}</div>
+        <div class="item-nick">${h.nickname}</div>
+        <div class="item-era">${h.era}</div>
+      </div>
+      <div class="item-badge">
+        <span class="badge-pill">${h.goldTag}</span>
+        <span class="chevron">›</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════
+//  RENDER DETAIL
+// ════════════════════════════════════════════
+function renderDetail(idx) {
+  const h = HOMOS[idx];
+  document.getElementById('dhName').textContent = h.name;
+  document.getElementById('dhEra').textContent = h.era;
+  document.getElementById('dhEmoji').textContent = h.emoji;
+
+  // Nav dots
+  const dots = document.getElementById('navDots');
+  dots.innerHTML = HOMOS.map((_, i) =>
+    `<div class="nav-dot ${i===idx?'active':''}" onclick="openHomo(${i})"></div>`
+  ).join('');
+
+  // Buttons
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === HOMOS.length - 1;
+  document.getElementById('btnNext').textContent = idx === HOMOS.length - 1 ? 'Fin del viaje' : 'Siguiente →';
+
+  // Detail scroll content
+  const scroll = document.getElementById('detailScroll');
+  let html = `
+    <div class="detail-hero">
+      <div class="detail-nick">${h.nickname.toUpperCase()}</div>
+      <div class="detail-desc">${h.description}</div>
+      <div class="detail-tags">
+        ${h.tags.map(t => `<span class="dtag ${t===h.goldTag?'gold':''}">${t}</span>`).join('')}
+      </div>
+      <div class="fact-grid">
+        ${h.facts.map(f => `
+          <div class="fact-box">
+            <div class="fact-label">${f.label}</div>
+            <div class="fact-val">${f.val}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="section-divider">Contenidos del panel</div>
+  `;
+
+  h.contenidos.forEach((c, ci) => {
+    const audioId = `audio_${idx}_${ci}`;
+    html += `
+      <div class="content-block">
+        <div class="block-top">
+          <div class="block-icon">${c.icono}</div>
+          <div class="block-meta">
+            <div class="block-title">${c.titulo}</div>
+            <div class="block-subtitle">${c.subtitulo}</div>
+          </div>
+        </div>
+        ${c.texto ? `<div class="block-text">${c.texto}</div>` : ''}
+        ${c.audio ? `
+          <div class="audio-wrap">
+            <div class="audio-player" id="ap_${audioId}">
+              <div class="ap-top">
+                <button class="ap-play" id="apbtn_${audioId}" onclick="toggleAudio('${audioId}','${c.audio}')">▶</button>
+                <div class="ap-info">
+                  <div class="ap-name">${c.audioNombre || 'Audio'}</div>
+                  <div class="ap-dur" id="apdur_${audioId}">Cargando…</div>
+                </div>
+              </div>
+              <div class="waveform-vis" id="wv_${audioId}" onclick="seekAudio(event,'${audioId}')">
+                ${genWaveHTML(audioId)}
+              </div>
+              <div class="ap-time-row">
+                <span id="aptime_${audioId}">0:00</span>
+                <span id="aptotal_${audioId}">—</span>
+              </div>
+            </div>
+          </div>
+        ` : (c.tipo==='audio' && !c.audio) ? `
+          <div class="audio-wrap">
+            <div style="background:#0e0e10;border:1px dashed #333;border-radius:10px;padding:1rem;text-align:center;font-size:13px;color:#444;">
+              🎵 Audio próximamente — añade la URL en el código
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  html += `
+    <div class="credits-footer">
+      <div class="credits-motto">"La evolución no es una carrera, es un viaje."</div>
+    </div>
+  `;
+
+  scroll.innerHTML = html;
+
+  // Init audio elements
+  h.contenidos.forEach((c, ci) => {
+    if (!c.audio) return;
+    const audioId = `audio_${idx}_${ci}`;
+    if (!audioElements[audioId]) {
+      const el = new Audio(c.audio);
+      el.preload = 'metadata';
+      el.onloadedmetadata = () => {
+        const s = Math.round(el.duration);
+        const dur = Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+        const durEl = document.getElementById('apdur_'+audioId);
+        const totEl = document.getElementById('aptotal_'+audioId);
+        if (durEl) durEl.textContent = dur;
+        if (totEl) totEl.textContent = dur;
+      };
+      el.ontimeupdate = () => updateWave(audioId, el);
+      el.onended = () => {
+        const btn = document.getElementById('apbtn_'+audioId);
+        if (btn) { btn.textContent = '▶'; btn.classList.remove('playing'); }
+        playingAudioId = null;
+        resetWave(audioId);
+      };
+      audioElements[audioId] = el;
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+//  AUDIO PLAYER
+// ════════════════════════════════════════════
+const WAVE_HEIGHTS = [6,9,14,18,22,20,16,12,18,24,20,15,10,14,19,22,18,13,8,6,9,12,17,21,18,14,10,7,11,16,20,17];
+
+function genWaveHTML(audioId) {
+  return WAVE_HEIGHTS.map((h, i) =>
+    `<div class="wv-bar" id="wvb_${audioId}_${i}" style="height:${h}px" data-i="${i}"></div>`
+  ).join('');
+}
+
+function toggleAudio(audioId, url) {
+  const el = audioElements[audioId];
+  if (!el) return;
+
+  if (playingAudioId && playingAudioId !== audioId) {
+    stopAllAudio();
+  }
+
+  const btn = document.getElementById('apbtn_'+audioId);
+  if (!btn) return;
+
+  if (el.paused) {
+    el.play().catch(()=>{});
+    btn.textContent = '⏸';
+    btn.classList.add('playing');
+    playingAudioId = audioId;
+  } else {
+    el.pause();
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    playingAudioId = null;
+  }
+}
+
+function stopAllAudio() {
+  Object.entries(audioElements).forEach(([id, el]) => {
+    if (!el.paused) {
+      el.pause();
+      const btn = document.getElementById('apbtn_'+id);
+      if (btn) { btn.textContent = '▶'; btn.classList.remove('playing'); }
+    }
+  });
+  playingAudioId = null;
+}
+
+function updateWave(audioId, el) {
+  if (!el.duration) return;
+  const pct = el.currentTime / el.duration;
+  const total = WAVE_HEIGHTS.length;
+  const played = Math.floor(pct * total);
+
+  for (let i = 0; i < total; i++) {
+    const bar = document.getElementById(`wvb_${audioId}_${i}`);
+    if (!bar) continue;
+    bar.className = 'wv-bar' + (i < played ? ' played' : i === played ? ' current' : '');
+  }
+
+  // Update time
+  const timeEl = document.getElementById('aptime_'+audioId);
+  if (timeEl) {
+    const s = Math.floor(el.currentTime);
+    timeEl.textContent = Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  }
+}
+
+function resetWave(audioId) {
+  WAVE_HEIGHTS.forEach((_, i) => {
+    const bar = document.getElementById(`wvb_${audioId}_${i}`);
+    if (bar) bar.className = 'wv-bar';
+  });
+}
+
+function seekAudio(event, audioId) {
+  const el = audioElements[audioId];
+  if (!el || !el.duration) return;
+  const wv = document.getElementById('wv_'+audioId);
+  if (!wv) return;
+  const rect = wv.getBoundingClientRect();
+  const pct = (event.clientX - rect.left) / rect.width;
+  el.currentTime = pct * el.duration;
+}
+
+// ════════════════════════════════════════════
+//  INSTALL / PWA
+// ════════════════════════════════════════════
+let deferredPrompt = null;
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installHint').style.display = 'flex';
+  setTimeout(() => document.getElementById('installBanner').classList.add('show'), 3000);
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+}
+
+if (isIos && !isInStandalone) {
+  document.getElementById('installHint').style.display = 'flex';
+  setTimeout(() => document.getElementById('iosHint').classList.add('show'), 4000);
+}
+
+// Service Worker for offline
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'origen-v1';
+    const ASSETS = [location.href];
+    self.addEventListener('install', e => e.waitUntil(
+      caches.open(CACHE).then(c => c.addAll(ASSETS))
+    ));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    ));
+  `;
+  const swBlob = new Blob([swCode], {type:'text/javascript'});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+function goHome() {
+  stopAllAudio();
+  updateProgress();
+  renderHome();
+  showScreen('home');
+}
+
+renderHome();
+</script>
+</body>
+</html>
