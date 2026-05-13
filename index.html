@@ -1,961 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>El Origen en Tus Manos</title>
-  <meta name="description" content="Museo interactivo DUA sobre evolución humana." />
-  <meta name="theme-color" content="#5A3E2B" />
-
-  <style>
-    :root {
-      --fondo: #F7EFE3;
-      --fondo-2: #FFF8ED;
-      --texto: #2B2118;
-      --suave: #7A6A5D;
-      --borde: rgba(90, 62, 43, 0.18);
-      --sombra: 0 18px 45px rgba(43, 33, 24, 0.16);
-      --marron: #5A3E2B;
-      --marron-claro: #B68A5B;
-      --verde-australo: #00B050;
-      --azul-homo: #00AFEF;
-      --morado-neandertal: #6F2F9F;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      overflow-x: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(182, 138, 91, 0.25), transparent 32rem),
-        radial-gradient(circle at bottom right, rgba(0, 175, 239, 0.16), transparent 28rem),
-        var(--fondo);
-      color: var(--texto);
-      line-height: 1.6;
-    }
-
-    p, li, td, th, span, button {
-      overflow-wrap: anywhere;
-    }
-
-    .pantalla { min-height: 100vh; padding: 24px; }
-
-    .hero {
-      display: grid;
-      place-items: center;
-      text-align: center;
-      min-height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-contenido { max-width: 820px; position: relative; z-index: 2; }
-
-    .etiqueta {
-      display: inline-block;
-      padding: 8px 14px;
-      border: 1px solid var(--borde);
-      border-radius: 999px;
-      background: rgba(255, 248, 237, 0.72);
-      color: var(--marron);
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      font-size: clamp(3rem, 9vw, 7.6rem);
-      line-height: 0.92;
-      margin: 0 0 18px;
-      color: var(--marron);
-      letter-spacing: -0.06em;
-    }
-
-    .subtitulo {
-      font-size: clamp(1.25rem, 3vw, 2rem);
-      margin: 0 0 12px;
-      font-weight: 800;
-    }
-
-    .cita {
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--suave);
-      margin-bottom: 30px;
-    }
-
-    .boton {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: 0;
-      border-radius: 999px;
-      padding: 14px 22px;
-      background: var(--marron);
-      color: #fff;
-      font-weight: 800;
-      text-decoration: none;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(90, 62, 43, 0.28);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .boton:hover, .boton:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(90, 62, 43, 0.34);
-      outline: none;
-    }
-
-    header {
-      max-width: 1150px;
-      margin: 0 auto 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding-top: 10px;
-    }
-
-    .marca {
-      font-weight: 900;
-      color: var(--marron);
-      font-size: 1.25rem;
-      line-height: 1.1;
-    }
-
-    .contador {
-      font-size: 0.95rem;
-      color: var(--suave);
-      font-weight: 700;
-    }
-
-    .grid {
-      max-width: 1150px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(230px, 340px) 1fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .selector {
-      display: grid;
-      gap: 12px;
-      position: sticky;
-      top: 18px;
-    }
-
-    .tarjeta-btn {
-      border: 2px solid transparent;
-      border-left-width: 9px;
-      background: rgba(255, 248, 237, 0.85);
-      border-radius: 22px;
-      padding: 15px 16px;
-      text-align: left;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(43, 33, 24, 0.08);
-      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .tarjeta-btn:hover, .tarjeta-btn:focus-visible, .tarjeta-btn.activa {
-      transform: translateY(-2px);
-      background: #fff;
-      border-top-color: var(--borde);
-      border-right-color: var(--borde);
-      border-bottom-color: var(--borde);
-      outline: none;
-    }
-
-    .tarjeta-btn strong { display: block; font-size: 1.05rem; color: var(--texto); }
-    .tarjeta-btn span { display: block; color: var(--suave); font-size: 0.9rem; margin-top: 4px; }
-
-    .panel {
-      background: rgba(255, 248, 237, 0.92);
-      border: 1px solid var(--borde);
-      border-radius: 32px;
-      box-shadow: var(--sombra);
-      overflow: hidden;
-    }
-
-    .panel-cabecera {
-      padding: 28px;
-      color: white;
-      background: var(--azul-homo);
-    }
-
-    .panel-cabecera h2 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 5vw, 4rem);
-      line-height: 1;
-      letter-spacing: -0.045em;
-      font-style: italic;
-    }
-
-    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      color: white;
-      border-radius: 999px;
-      padding: 7px 11px;
-      font-size: 0.92rem;
-      font-weight: 800;
-    }
-
-    .panel-cuerpo { padding: 28px; display: grid; gap: 22px; }
-
-    .bloque {
-      background: #fff;
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      padding: 20px;
-    }
-
-    .bloque h3 {
-      margin: 0 0 12px;
-      color: var(--marron);
-      font-size: 1.25rem;
-    }
-
-    .claves {
-      display: grid;
-      gap: 10px;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .claves li {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      font-weight: 650;
-    }
-
-    .claves li::before { content: "✋"; flex: 0 0 auto; }
-
-
-
-    .craneo-visual {
-      display: grid;
-      grid-template-columns: minmax(180px, 360px) 1fr;
-      gap: 18px;
-      align-items: center;
-      background: #fff;
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      padding: 18px;
-      overflow: hidden;
-    }
-
-    .craneo-marco {
-      border-radius: 20px;
-      background: #fff;
-      border: 1px solid var(--borde);
-      min-height: 220px;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-    }
-
-    .craneo-marco img {
-      width: 100%;
-      height: 100%;
-      max-height: 280px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .craneo-texto h3 {
-      margin: 0 0 8px;
-      color: var(--marron);
-      font-size: 1.25rem;
-    }
-
-    .craneo-texto p {
-      margin: 0;
-      color: var(--suave);
-      font-weight: 700;
-    }
-
-    .datos-rapidos {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .dato-card {
-      background: #fff;
-      border: 1px solid var(--borde);
-      border-radius: 20px;
-      padding: 16px;
-      min-height: 126px;
-      box-shadow: 0 6px 16px rgba(43, 33, 24, 0.06);
-    }
-
-    .dato-card .icono {
-      display: inline-flex;
-      width: 36px;
-      height: 36px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      color: white;
-      font-size: 1.2rem;
-      margin-bottom: 9px;
-    }
-
-    .dato-card h3 {
-      margin: 0 0 6px;
-      color: var(--marron);
-      font-size: 1rem;
-    }
-
-    .dato-card p {
-      margin: 0;
-      color: var(--texto);
-      font-weight: 650;
-      font-size: 0.98rem;
-      line-height: 1.45;
-    }
-
-    .audio-controles {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 14px;
-    }
-
-    .boton-audio {
-      border: 0;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-weight: 850;
-      cursor: pointer;
-      background: var(--marron);
-      color: white;
-      transition: transform 0.15s ease;
-    }
-
-    .boton-audio.secundario { background: #EFE4D4; color: var(--texto); }
-
-    .boton-audio:hover, .boton-audio:focus-visible {
-      transform: translateY(-1px);
-      outline: none;
-    }
-
-    .pregunta { border-left: 6px solid currentColor; }
-    .pregunta p { margin: 0; }
-    .respuesta { margin-top: 10px; font-weight: 800; }
-
-    .navegacion {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .nav-btn {
-      border: 1px solid var(--borde);
-      background: #fff;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .tabla-wrap {
-      max-width: 1150px;
-      margin: 28px auto 0;
-      background: rgba(255, 248, 237, 0.92);
-      border: 1px solid var(--borde);
-      border-radius: 28px;
-      padding: 20px;
-      overflow-x: auto;
-      box-shadow: 0 8px 28px rgba(43, 33, 24, 0.08);
-    }
-
-    table { width: 100%; border-collapse: collapse; min-width: 760px; overflow: hidden; border-radius: 18px; }
-    th, td {
-      padding: 13px 14px;
-      text-align: left;
-      border-bottom: 1px solid rgba(90, 62, 43, 0.14);
-      vertical-align: top;
-    }
-
-    th { background: var(--marron); color: white; font-size: 0.95rem; }
-    tr:last-child td { border-bottom: 0; }
-
-    .color-pill {
-      display: inline-flex;
-      width: 18px;
-      height: 18px;
-      border-radius: 99px;
-      margin-right: 8px;
-      vertical-align: middle;
-      border: 1px solid rgba(0, 0, 0, 0.18);
-    }
-
-    .cierre {
-      max-width: 900px;
-      margin: 30px auto 70px;
-      text-align: center;
-      font-size: 1.15rem;
-      color: var(--suave);
-      padding: 0 18px;
-    }
-
-    
-    .leer-linea {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      border: 1px solid var(--borde);
-      border-radius: 999px;
-      background: #EFE4D4;
-      color: var(--texto);
-      font-weight: 850;
-      font-size: 0.9rem;
-      padding: 8px 11px;
-      cursor: pointer;
-      margin: 8px 0 0;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .leer-linea:hover,
-    .leer-linea:focus-visible {
-      transform: translateY(-1px);
-      background: #E6D7C3;
-      outline: none;
-    }
-
-    .bloque-titulo-audio {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .bloque-titulo-audio h3 {
-      margin: 0;
-    }
-
-    .estado-audio {
-      font-weight: 800;
-      color: var(--suave);
-      font-size: 0.92rem;
-    }
-
-
-    .barra-accesibilidad {
-      max-width: 1150px;
-      margin: 0 auto 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 248, 237, 0.95);
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      padding: 12px;
-      box-shadow: 0 8px 20px rgba(43, 33, 24, 0.08);
-    }
-
-    .grupo-accesibilidad {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .boton-accesible {
-      border: 1px solid var(--borde);
-      background: #fff;
-      color: var(--texto);
-      border-radius: 999px;
-      padding: 10px 13px;
-      font-weight: 850;
-      cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .boton-accesible:hover,
-    .boton-accesible:focus-visible,
-    .boton-accesible.activo {
-      transform: translateY(-1px);
-      outline: 3px solid rgba(0, 175, 239, 0.35);
-      background: #EFE4D4;
-    }
-
-    .instrucciones {
-      max-width: 1150px;
-      margin: 0 auto 18px;
-      background: rgba(255, 248, 237, 0.95);
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: 0 8px 20px rgba(43, 33, 24, 0.08);
-    }
-
-    .instrucciones h2 {
-      margin: 0 0 8px;
-      color: var(--marron);
-      font-size: 1.35rem;
-    }
-
-    .instrucciones p {
-      margin: 0;
-      color: var(--suave);
-      font-weight: 700;
-    }
-
-    .modo-facil .texto-normal {
-      display: none;
-    }
-
-    .texto-facil {
-      display: none;
-    }
-
-    .modo-facil .texto-facil {
-      display: block;
-    }
-
-    .letra-grande {
-      font-size: 112%;
-    }
-
-    .alto-contraste {
-      --fondo: #ffffff;
-      --fondo-2: #ffffff;
-      --texto: #000000;
-      --suave: #1f1f1f;
-      --borde: #000000;
-      --marron: #000000;
-      background: #ffffff !important;
-      color: #000000 !important;
-    }
-
-    .alto-contraste .panel,
-    .alto-contraste .bloque,
-    .alto-contraste .dato-card,
-    .alto-contraste .tabla-wrap,
-    .alto-contraste .instrucciones,
-    .alto-contraste .barra-accesibilidad,
-    .alto-contraste .tarjeta-btn {
-      background: #ffffff !important;
-      border-color: #000000 !important;
-      color: #000000 !important;
-      box-shadow: none !important;
-    }
-
-    .alto-contraste .panel-cabecera {
-      background: #000000 !important;
-      color: #ffffff !important;
-    }
-
-    .alto-contraste .chip,
-    .alto-contraste .boton,
-    .alto-contraste .boton-audio {
-      background: #000000 !important;
-      color: #ffffff !important;
-      border: 2px solid #000000 !important;
-    }
-
-    .alto-contraste a,
-    .alto-contraste button {
-      outline-color: #000000;
-    }
-
-    button:focus-visible,
-    a:focus-visible {
-      outline: 4px solid rgba(0, 175, 239, 0.55);
-      outline-offset: 3px;
-    }
-
-
-    select.boton-accesible {
-      appearance: auto;
-      min-width: 210px;
-      max-width: 330px;
-    }
-
-@media (max-width: 850px) {
-      .pantalla {
-        padding: 12px;
-        min-height: auto;
-      }
-
-      .hero {
-        min-height: 92vh;
-        padding: 20px 14px;
-      }
-
-      h1 {
-        font-size: clamp(2.45rem, 16vw, 4.1rem);
-        line-height: 0.95;
-        letter-spacing: -0.045em;
-      }
-
-      .subtitulo {
-        font-size: 1.2rem;
-      }
-
-      .cita {
-        font-size: 1rem;
-        margin-bottom: 22px;
-      }
-
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 14px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      .selector {
-        position: static;
-        grid-template-columns: 1fr;
-        gap: 9px;
-      }
-
-      .tarjeta-btn {
-        border-radius: 16px;
-        padding: 12px 13px;
-      }
-
-      .panel {
-        border-radius: 22px;
-      }
-
-      .panel-cabecera {
-        padding: 18px;
-      }
-
-      .panel-cabecera h2 {
-        font-size: clamp(1.85rem, 12vw, 3rem);
-        line-height: 1.05;
-      }
-
-      .meta {
-        gap: 7px;
-      }
-
-      .chip {
-        font-size: 0.82rem;
-        padding: 6px 9px;
-      }
-
-      .panel-cuerpo {
-        padding: 16px;
-        gap: 14px;
-      }
-
-      .bloque {
-        border-radius: 18px;
-        padding: 15px;
-      }
-
-      .craneo-visual {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        border-radius: 18px;
-        padding: 14px;
-      }
-
-      .craneo-marco {
-        min-height: 0;
-        height: auto;
-        max-height: 230px;
-        border-radius: 16px;
-      }
-
-      .craneo-marco img {
-        width: 100%;
-        height: auto;
-        max-height: 220px;
-        object-fit: contain;
-      }
-
-      .datos-rapidos {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .dato-card {
-        min-height: auto;
-        border-radius: 18px;
-        padding: 14px;
-      }
-
-      .audio-controles {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .boton-audio,
-      .nav-btn,
-      .boton,
-      .leer-linea {
-        width: 100%;
-      }
-
-      .bloque-titulo-audio {
-        align-items: stretch;
-      }
-
-      .navegacion {
-        flex-direction: column;
-      }
-
-      .barra-accesibilidad,
-      .grupo-accesibilidad {
-        width: 100%;
-      }
-
-      .boton-accesible {
-        width: 100%;
-      }
-
-      .instrucciones {
-        padding: 15px;
-        border-radius: 18px;
-      }
-
-      .tabla-wrap {
-        margin-top: 18px;
-        padding: 12px;
-        border-radius: 20px;
-      }
-
-      table {
-        min-width: 560px;
-        font-size: 0.9rem;
-      }
-
-      th,
-      td {
-        padding: 10px;
-      }
-
-      .cierre {
-        font-size: 1rem;
-        margin: 22px auto 38px;
-      }
-    }
-
-    @media (max-width: 430px) {
-      .pantalla {
-        padding: 10px;
-      }
-
-      h1 {
-        font-size: clamp(2.2rem, 18vw, 3.45rem);
-      }
-
-      .etiqueta {
-        font-size: 0.85rem;
-        padding: 7px 10px;
-      }
-
-      .panel-cabecera h2 {
-        font-size: clamp(1.65rem, 11vw, 2.35rem);
-      }
-
-      .craneo-marco img {
-        max-height: 190px;
-      }
-
-      table {
-        min-width: 500px;
-      }
-    }
-  
-  </style>
-</head>
-
-<body>
-  <main>
-    <section class="hero pantalla" id="inicio">
-      <div class="hero-contenido">
-        <div class="etiqueta">Museo Interactivo · DUA</div>
-        <h1>El Origen<br />en Tus Manos</h1>
-        <p class="subtitulo">La evolución humana</p>
-        <p class="cita">“La evolución no es una carrera, es un viaje.”</p>
-        <a class="boton" href="#explorar">Comenzar el viaje →</a>
-      </div>
-    </section>
-
-    <section class="pantalla" id="explorar" aria-labelledby="titulo-explorar">
-      <header>
-        <div>
-          <div class="marca">El Origen<br />en Tus Manos</div>
-          <p id="titulo-explorar" class="contador">Selecciona un homínido para explorar</p>
-        </div>
-        <div class="contador">5 homínidos · texto + audio · descripción táctil</div>
-      </header>
-
-      <section class="instrucciones" aria-labelledby="titulo-instrucciones">
-        <h2 id="titulo-instrucciones">Cómo usar esta actividad</h2>
-        <p>
-          Elige una especie, observa la imagen, lee o escucha la información y, si tienes el cráneo 3D delante,
-          tócalo con las manos mientras escuchas la descripción táctil. También puedes activar lectura fácil,
-          letra grande o alto contraste.
-        </p>
-      </section>
-
-      <section class="barra-accesibilidad" aria-label="Opciones de accesibilidad">
-        <div class="grupo-accesibilidad">
-          <button class="boton-accesible" id="lecturaFacilBtn" type="button">📘 Lectura fácil</button>
-          <button class="boton-accesible" id="letraGrandeBtn" type="button">🔎 Letra grande</button>
-          <button class="boton-accesible" id="contrasteBtn" type="button">◐ Alto contraste</button>
-        </div>
-        <div class="grupo-accesibilidad" aria-label="Velocidad del audio">
-          <span class="contador">Velocidad audio:</span>
-          <button class="boton-accesible activo" id="velocidadNormalBtn" type="button">Natural</button>
-          <button class="boton-accesible" id="velocidadLentaBtn" type="button">Lenta</button>
-        </div>
-        <div class="grupo-accesibilidad" aria-label="Selección de voz">
-          <label class="contador" for="selectorVoz">Voz:</label>
-          <select class="boton-accesible" id="selectorVoz" aria-label="Seleccionar voz del audio">
-            <option value="">Voz automática</option>
-          </select>
-        </div>
-      </section>
-
-      <div class="grid">
-        <nav class="selector" aria-label="Selector de homínidos" id="selector"></nav>
-
-        <article class="panel" aria-live="polite">
-          <div class="panel-cabecera" id="panelCabecera">
-            <h2 id="nombre">Australopithecus</h2>
-            <p id="descripcionCorta">Bipedismo habitual con rasgos arborícolas.</p>
-            <div class="meta">
-              <span class="chip" id="cronologia">4,2–1,9 Ma</span>
-              <span class="chip" id="lugar">África oriental y meridional</span>
-              <span class="chip" id="idea">Bipedismo</span>
-            </div>
-          </div>
-
-          <div class="panel-cuerpo">
-            <section class="craneo-visual" aria-label="Imagen del cráneo">
-              <div class="craneo-marco">
-                <img id="imagenCraneo" src="" alt="" />
-              </div>
-              <div class="craneo-texto">
-                <div class="bloque-titulo-audio">
-                  <h3 id="tituloCraneo">Cráneo 3D</h3>
-                  <button class="leer-linea" type="button" data-audio="craneo">🔊 Escuchar</button>
-                </div>
-                <p id="captionCraneo"></p>
-              </div>
-            </section>
-
-            <section class="bloque">
-              <div class="bloque-titulo-audio">
-                <h3>Descripción táctil del cráneo</h3>
-                <button class="leer-linea" type="button" data-audio="tactil">🔊 Escuchar descripción táctil</button>
-              </div>
-              <p id="descripcionTactil"></p>
-            </section>
-
-            <section class="bloque">
-              <div class="bloque-titulo-audio">
-                <h3>Datos clave</h3>
-                <button class="leer-linea" type="button" data-audio="datos">🔊 Escuchar datos</button>
-              </div>
-              <ul class="claves" id="claves"></ul>
-            </section>
-
-            <section class="datos-rapidos" aria-label="Datos rápidos de la especie">
-              <div class="dato-card">
-                <span class="icono" id="iconoCapacidad">🧠</span>
-                <h3>Capacidad craneal</h3>
-                <p id="capacidadCraneal"></p>
-                <button class="leer-linea" type="button" data-audio="capacidad">🔊 Escuchar</button>
-              </div>
-              <div class="dato-card">
-                <span class="icono" id="iconoRasgos">🦴</span>
-                <h3>Rasgos clave</h3>
-                <p id="rasgosClave"></p>
-                <button class="leer-linea" type="button" data-audio="rasgos">🔊 Escuchar</button>
-              </div>
-              <div class="dato-card">
-                <span class="icono" id="iconoCuriosidad">✨</span>
-                <h3>Curiosidad</h3>
-                <p id="curiosidad"></p>
-                <button class="leer-linea" type="button" data-audio="curiosidad">🔊 Escuchar</button>
-              </div>
-            </section>
-
-            <section class="bloque">
-              <div class="bloque-titulo-audio">
-                <h3>Texto para escuchar</h3>
-                <span class="estado-audio" id="estadoAudio">Audio detenido</span>
-              </div>
-              <p id="textoAudio" class="texto-normal"></p>
-              <p id="textoFacil" class="texto-facil"></p>
-              <div class="audio-controles">
-                <button class="boton-audio" id="escucharBtn" type="button">🔊 Escuchar texto completo</button>
-                <button class="boton-audio secundario" id="pausarBtn" type="button">⏸ Pausar</button>
-                <button class="boton-audio secundario" id="pararBtn" type="button">⏹ Parar</button>
-              </div>
-            </section>
-
-            <section class="bloque pregunta" id="preguntaBloque">
-              <div class="bloque-titulo-audio">
-                <h3>Pregunta para pensar</h3>
-                <button class="leer-linea" type="button" data-audio="pregunta">🔊 Escuchar pregunta</button>
-              </div>
-              <p id="pregunta"></p>
-              <p class="respuesta" id="respuesta"></p>
-            </section>
-
-            <div class="navegacion">
-              <button class="nav-btn" id="anteriorBtn" type="button">← Anterior</button>
-              <button class="nav-btn" id="siguienteBtn" type="button">Siguiente →</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <section class="tabla-wrap" aria-labelledby="titulo-tabla">
-        <h2 id="titulo-tabla">Resumen rápido</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Especie / grupo</th>
-              <th>Cronología</th>
-              <th>Lugar clave</th>
-              <th>Idea principal</th>
-            </tr>
-          </thead>
-          <tbody id="tablaResumen"></tbody>
-        </table>
-      </section>
-
-      <p class="cierre">
-        La evolución humana no fue una línea recta ni una carrera hacia el presente.
-        Fue un proceso lleno de ramas, especies distintas y formas de vida diferentes.
-        Cada hominino nos ayuda a comprender una parte de nuestra historia.
-      </p>
-    </section>
-  </main>
-
- <script>
+<script>
 const hominidos = [
   {
     nombre: "Australopithecus",
@@ -963,20 +6,22 @@ const hominidos = [
     cronologia: "4,2–1,9 Ma",
     lugar: "África oriental y meridional",
     idea: "Bipedismo habitual",
+    ideaResumen: "Bipedismo habitual · sin industria lítica en el tablero",
+    imagen: "https://commons.wikimedia.org/wiki/Special:FilePath/Australopithecus%20africanus%20skull.jpg?width=900",
+    imagenAlt: "Cráneo de Australopithecus africanus",
+    captionCraneo: "Cráneo de Australopithecus africanus. En el tablero se representa por el bipedismo, no por herramientas.",
     descripcionCorta: "Bipedismo habitual con rasgos arborícolas.",
-    descripcionTactil: "Al palpar este cráneo notarás que es pequeño y bajo. La cara sobresale bastante hacia delante y la mandíbula resulta más marcada que en los humanos actuales. La frente no es vertical, sino inclinada hacia atrás. Es un cráneo todavía muy primitivo, pero pertenece a un grupo clave porque ya caminaba de forma habitual sobre dos piernas.",
-    imagenAlt: "Imagen de cráneo de Australopithecus",
-    captionCraneo: "Cráneo de Australopithecus, con cráneo pequeño, cara proyectada y rasgos todavía primitivos.",
-    capacidadCraneal: "Aprox. 400–500 cc.",
-    rasgosClave: "Bipedismo habitual, aunque conservaban rasgos arborícolas como brazos relativamente largos, falanges curvadas y hombros primitivos.",
-    curiosidad: "Las huellas de Laetoli, de hace unos 3,7 millones de años, muestran una marcha bípeda muy parecida a la humana.",
+    descripcionTactil: "Al palpar este cráneo notarás que es pequeño y bajo. La cara sobresale bastante hacia delante y la mandíbula resulta más marcada que en los humanos actuales. La frente no es vertical, sino inclinada hacia atrás. Es un cráneo todavía primitivo, pero pertenece a un grupo clave porque ya caminaba de forma habitual sobre dos piernas.",
+    capacidadCraneal: "400–500 cc aprox.",
+    rasgosClave: "Bipedismo habitual, aunque conservaba rasgos arborícolas como brazos relativamente largos, dedos algo curvados y hombros primitivos.",
+    curiosidad: "Las huellas de Laetoli muestran una marcha bípeda muy parecida a la humana hace unos 3,7 millones de años.",
     claves: [
-      "Vivieron en África entre 4,2 y 1,9 millones de años.",
-      "Caminaban de forma habitual sobre dos piernas.",
-      "Conservaban rasgos relacionados con la vida en los árboles.",
-      "No se representa con industria lítica en el tablero: su elemento clave son las huellas, la pelvis o el bipedismo."
+      "Vivió en África entre 4,2 y 1,9 millones de años.",
+      "Su rasgo principal es el bipedismo habitual.",
+      "Conservaba rasgos relacionados con la vida en los árboles.",
+      "En el tablero no se representa con herramienta: se representa con huellas, pelvis, fémur o bipedismo."
     ],
-    textoAudio: "Los australopitecos vivieron en África hace aproximadamente entre 4,2 y 1,9 millones de años. Son importantes porque muestran un bipedismo ya habitual, aunque todavía conservaban rasgos relacionados con la vida en los árboles. Tenían brazos relativamente largos, falanges algo curvadas y una articulación del hombro todavía primitiva. Una de las pruebas más famosas de su bipedismo son las huellas de Laetoli, en Tanzania, donde se observa una forma de caminar muy parecida a la nuestra. En el tablero no los asociamos a una herramienta de piedra, sino al bipedismo, porque ese es el rasgo principal que queremos destacar.",
+    textoAudio: "Los australopitecos vivieron en África hace aproximadamente entre 4,2 y 1,9 millones de años. Son importantes porque muestran un bipedismo ya habitual, aunque todavía conservaban rasgos relacionados con la vida en los árboles. Tenían brazos relativamente largos, dedos algo curvados y una articulación del hombro todavía primitiva. Una de las pruebas más famosas de su bipedismo son las huellas de Laetoli, en Tanzania, donde se observa una forma de caminar muy parecida a la nuestra. En el tablero no los asociamos a una herramienta de piedra, sino al bipedismo, porque ese es el rasgo principal que queremos destacar.",
     textoFacil: "Los australopitecos vivieron en África hace millones de años. Caminaban sobre dos piernas, pero todavía podían trepar. Su cráneo era pequeño y su cara sobresalía. En el tablero no llevan herramienta: su idea clave es el bipedismo.",
     pregunta: "¿Por qué en Australopithecus no ponemos una herramienta de piedra?",
     respuesta: "Porque en esta actividad lo representamos por el bipedismo. La industria lítica se reserva para el género Homo."
@@ -987,14 +32,16 @@ const hominidos = [
     color: "#00AFEF",
     cronologia: "1,9–1,4 Ma",
     lugar: "Olduvai, Tanzania / Kenia",
-    idea: "Primeras herramientas simples",
+    idea: "Modo 1 / lasca",
+    ideaResumen: "Primeras herramientas simples · Modo 1 / lasca",
+    imagen: "https://commons.wikimedia.org/wiki/Special:FilePath/Homo%20habilis%20KNM%20ER%201813.jpg?width=900",
+    imagenAlt: "Cráneo de Homo habilis KNM ER 1813",
+    captionCraneo: "Cráneo de Homo habilis KNM-ER 1813. Representa los primeros Homo asociados a herramientas simples.",
     descripcionCorta: "Primeros Homo asociados a herramientas sencillas de Modo 1.",
     descripcionTactil: "Este cráneo sigue siendo pequeño, pero al tocarlo se aprecia algo más redondeado que el de Australopithecus. La cara todavía se proyecta hacia delante, aunque algo menos. La frente sigue siendo baja y no muy vertical. Es un cráneo de transición: no parece tan simiesco como Australopithecus, pero tampoco tan moderno como Homo sapiens.",
-    imagenAlt: "Imagen de cráneo de Homo habilis",
-    captionCraneo: "Cráneo de Homo habilis ER-1813, ejemplo clásico de los primeros Homo.",
-    capacidadCraneal: "Aprox. 490–650 cc.",
-    rasgosClave: "Capacidad craneal mayor que en Australopithecus y asociación con herramientas simples de Modo 1: núcleo, percutor y lasca.",
-    curiosidad: "Su nombre significa “hombre hábil” por su asociación con la fabricación de herramientas.",
+    capacidadCraneal: "490–650 cc aprox.",
+    rasgosClave: "Cráneo algo mayor que Australopithecus y asociación con herramientas simples: núcleo, percutor y lasca.",
+    curiosidad: "Su nombre significa “hombre hábil” por su relación con la fabricación de herramientas.",
     claves: [
       "Vivió aproximadamente entre 1,9 y 1,4 millones de años.",
       "Se localiza en África oriental, especialmente Olduvai, Tanzania, y Kenia.",
@@ -1007,30 +54,32 @@ const hominidos = [
     respuesta: "Una lasca de piedra, porque se asocia al Modo 1."
   },
 
-{
-  nombre: "Homo erectus",
-  color: "#92D050",
-  cronologia: "1,9–0,1 Ma",
-  lugar: "África, Java y China",
-  idea: "Modo 2 y bifaz",
-  descripcionCorta: "Homo erectus presenta un cráneo más grande y robusto, y se asocia a herramientas más planificadas como el bifaz.",
-  descripcionTactil: "Al tocar este cráneo notarás que es más grande que el de Homo habilis y más robusto. La frente sigue siendo baja y aparece un reborde marcado sobre los ojos, llamado torus supraorbitario. La forma del cráneo todavía no es globular como la nuestra, sino más alargada y baja. Representa un paso importante dentro del género Homo.",
-  imagenAlt: "Imagen de cráneo de Homo erectus",
-  captionCraneo: "Cráneo de Homo erectus, con neurocráneo mayor que Homo habilis y torus supraorbitario marcado.",
-  capacidadCraneal: "Aprox. 800–1200 cc.",
-  rasgosClave: "Cráneo robusto, torus supraorbitario marcado, aumento de la capacidad craneal y cuerpo con proporciones más modernas.",
-  curiosidad: "Se asocia a herramientas más planificadas, especialmente al Modo 2 o Achelense, donde destaca el bifaz.",
-  claves: [
-    "Vivió aproximadamente entre 1,9 y 0,1 millones de años.",
-    "Se localiza en África y Asia, especialmente Java y China.",
-    "Presenta mayor capacidad craneal que Homo habilis.",
-    "En el tablero no ponemos fuego aquí: lo representamos con Modo 2 y un bifaz."
-  ],
-  textoAudio: "Homo erectus vivió aproximadamente entre 1,9 y 0,1 millones de años. Se localiza en África y Asia, especialmente en zonas como Java y China. Presenta una capacidad craneal mayor que Homo habilis y un cráneo más robusto, con torus supraorbitario marcado y frente baja. En nuestro tablero no lo vamos a representar con el fuego, sino con una herramienta más planificada: el bifaz. El bifaz pertenece al Modo 2 o Achelense y muestra una fabricación más elaborada que las herramientas simples del Modo 1.",
-  textoFacil: "Homo erectus vivió hace más de un millón de años. Tenía un cráneo más grande que Homo habilis y un cuerpo más parecido al nuestro. En el tablero lo representamos con un bifaz, una herramienta de piedra más elaborada. No ponemos fuego en esta especie.",
-  pregunta: "¿Qué herramienta representa mejor a Homo erectus en nuestro tablero?",
-  respuesta: "El bifaz, porque se asocia al Modo 2 o Achelense y muestra una tecnología más planificada."
-}
+  {
+    nombre: "Homo erectus",
+    color: "#92D050",
+    cronologia: "1,9–0,1 Ma",
+    lugar: "África, Java y China",
+    idea: "Modo 2 / bifaz",
+    ideaResumen: "Herramientas más planificadas · Modo 2 / bifaz",
+    imagen: "https://commons.wikimedia.org/wiki/Special:FilePath/Homo%20erectus%20skull.jpg?width=900",
+    imagenAlt: "Cráneo de Homo erectus",
+    captionCraneo: "Cráneo de Homo erectus, con neurocráneo mayor que Homo habilis y torus supraorbitario marcado.",
+    descripcionCorta: "Cráneo más grande y robusto, asociado a herramientas más planificadas como el bifaz.",
+    descripcionTactil: "Al tocar este cráneo notarás que es más grande que el de Homo habilis y más robusto. La frente sigue siendo baja y aparece un reborde marcado sobre los ojos, llamado torus supraorbitario. La forma del cráneo todavía no es globular como la nuestra, sino más alargada y baja. Representa un paso importante dentro del género Homo.",
+    capacidadCraneal: "800–1200 cc aprox.",
+    rasgosClave: "Cráneo robusto con torus supraorbitario marcado, aumento de la capacidad craneal y cuerpo con proporciones más modernas.",
+    curiosidad: "En el tablero no lo representamos con fuego, sino con una herramienta más planificada: el bifaz.",
+    claves: [
+      "Vivió aproximadamente entre 1,9 y 0,1 millones de años.",
+      "Se localiza en África y Asia, especialmente Java y China.",
+      "Presenta mayor capacidad craneal que Homo habilis.",
+      "En el tablero no ponemos fuego aquí: lo representamos con Modo 2 y un bifaz."
+    ],
+    textoAudio: "Homo erectus vivió aproximadamente entre 1,9 y 0,1 millones de años. Se localiza en África y Asia, especialmente en zonas como Java y China. Presenta una capacidad craneal mayor que Homo habilis y un cráneo más robusto, con torus supraorbitario marcado y frente baja. En nuestro tablero no lo vamos a representar con el fuego, sino con una herramienta más planificada: el bifaz. El bifaz pertenece al Modo 2 o Achelense y muestra una fabricación más elaborada que las herramientas simples del Modo 1.",
+    textoFacil: "Homo erectus vivió hace más de un millón de años. Tenía un cráneo más grande que Homo habilis y un cuerpo más parecido al nuestro. En el tablero lo representamos con un bifaz, una herramienta de piedra más elaborada. No ponemos fuego en esta especie.",
+    pregunta: "¿Qué herramienta representa mejor a Homo erectus en nuestro tablero?",
+    respuesta: "El bifaz, porque se asocia al Modo 2 o Achelense y muestra una tecnología más planificada."
+  },
 
   {
     nombre: "Homo neanderthalensis",
@@ -1038,13 +87,15 @@ const hominidos = [
     cronologia: "0,23–0,03 Ma",
     lugar: "Europa, Oriente Próximo y Asia occidental",
     idea: "Fuego, Modo 3 y simbolismo",
+    ideaResumen: "Fuego · Modo 3 · conducta simbólica",
+    imagen: "https://commons.wikimedia.org/wiki/Special:FilePath/Neanderthal%20Skull%20%288624714463%29.jpg?width=900",
+    imagenAlt: "Cráneo de Homo neanderthalensis",
+    captionCraneo: "Cráneo de Homo neanderthalensis, con neurocráneo bajo y alargado y torus supraorbitario marcado.",
     descripcionCorta: "Neandertales: robustos, con dominio del fuego, Modo 3 y conducta simbólica.",
     descripcionTactil: "Al palpar este cráneo notarás que es bajo y alargado, como un balón de rugby. La frente se inclina hacia atrás y sobre los ojos aparece un reborde marcado, llamado torus supraorbitario. La cara media se proyecta hacia delante y la mandíbula no tiene mentón como la nuestra. Es un cráneo muy robusto, pero con una capacidad craneal muy alta.",
-    imagenAlt: "Imagen de cráneo de Homo neanderthalensis",
-    captionCraneo: "Cráneo de Homo neanderthalensis, con neurocráneo bajo y alargado y torus supraorbitario marcado.",
-    capacidadCraneal: "Aprox. 1500 cc de media.",
-    rasgosClave: "Neurocráneo bajo y alargado, frente huidiza, torus supraorbitario marcado, cara media proyectada y cuerpo robusto.",
-    curiosidad: "En yacimientos como Abric Romaní se han encontrado evidencias de fuegos organizados con distintas funciones.",
+    capacidadCraneal: "1500 cc aprox.",
+    rasgosClave: "Cráneo bajo y alargado, frente huidiza, torus supraorbitario marcado, cara media proyectada y cuerpo robusto.",
+    curiosidad: "En yacimientos neandertales se han encontrado evidencias de hogares, uso del fuego, herramientas complejas y conducta simbólica.",
     claves: [
       "Vivió aproximadamente entre 0,23 y 0,03 millones de años.",
       "Habitó Europa, Oriente Próximo y parte de Asia occidental.",
@@ -1053,8 +104,8 @@ const hominidos = [
     ],
     textoAudio: "Homo neanderthalensis vivió aproximadamente entre 0,23 y 0,03 millones de años en Europa, Oriente Próximo y parte de Asia occidental. Tenía una capacidad craneal muy alta, de unos 1500 centímetros cúbicos de media, y un cuerpo muy robusto. Su cráneo era bajo y alargado, con frente huidiza y torus supraorbitario marcado. En el tablero es adecuado colocar el fuego en los neandertales, porque se asocian al dominio del fuego, al Modo 3 musteriense y a comportamientos complejos. También encontramos evidencias de posibles enterramientos, adornos personales, pigmentos, plumas y manifestaciones simbólicas.",
     textoFacil: "Los neandertales vivieron en Europa y Asia occidental. Eran fuertes y tenían un cráneo grande, bajo y alargado. Usaban herramientas complejas y dominaban el fuego. También pudieron tener adornos, pigmentos y enterramientos.",
-    pregunta: "¿Por qué el fuego encaja mejor en Neandertal que en Homo ergaster dentro de nuestro tablero?",
-    respuesta: "Porque en los apuntes el comportamiento neandertal incluye claramente el dominio del fuego, junto con Modo 3, simbolismo y posibles enterramientos."
+    pregunta: "¿Por qué el fuego encaja mejor en Neandertal que en Homo erectus dentro de nuestro tablero?",
+    respuesta: "Porque en esta actividad el comportamiento neandertal incluye claramente el dominio del fuego, junto con Modo 3, simbolismo y posibles enterramientos."
   },
 
   {
@@ -1062,19 +113,21 @@ const hominidos = [
     color: "#F4A261",
     cronologia: "0,3 Ma–actualidad",
     lugar: "África / distribución mundial",
-    idea: "Tecnología especializada y expansión mundial",
+    idea: "Tecnología especializada",
+    ideaResumen: "Tecnología especializada · simbolismo · expansión mundial",
+    imagen: "https://commons.wikimedia.org/wiki/Special:FilePath/Homo%20sapiens%20skull.jpg?width=900",
+    imagenAlt: "Cráneo de Homo sapiens",
+    captionCraneo: "Cráneo de Homo sapiens, alto y globular, con frente vertical y mentón.",
     descripcionCorta: "Cráneo alto y globular, tecnología especializada, simbolismo y expansión mundial.",
     descripcionTactil: "Al palpar este cráneo notarás que es alto, corto y redondeado, más parecido a un balón de fútbol que a un balón de rugby. La frente es vertical y no hay un torus supraorbitario marcado sobre los ojos. La cara queda más retraída bajo el neurocráneo y la mandíbula presenta mentón. Es el cráneo más parecido al nuestro porque pertenece a nuestra propia especie.",
-    imagenAlt: "Imagen de cráneo de Homo sapiens",
-    captionCraneo: "Cráneo de Homo sapiens, alto y globular, con frente vertical y mentón.",
-    capacidadCraneal: "Aprox. 1350 cc.",
-    rasgosClave: "Neurocráneo alto y globular, frente vertical, ausencia de torus supraorbitario marcado, cara retraída y presencia de mentón.",
+    capacidadCraneal: "1350 cc aprox.",
+    rasgosClave: "Cráneo alto y globular, frente vertical, ausencia de torus supraorbitario marcado, cara retraída y presencia de mentón.",
     curiosidad: "Nuestra especie surge en África y acaba expandiéndose por todo el planeta.",
     claves: [
       "Aparece aproximadamente hace 0,3 millones de años.",
       "Tiene origen africano y distribución mundial.",
       "Presenta cráneo alto y globular, frente vertical y mentón.",
-      "Se asocia a tecnología especializada, simbolismo, arte y expansión mundial."
+      "Se asocia a tecnología especializada con piedra, hueso y asta, además de simbolismo y arte."
     ],
     textoAudio: "Homo sapiens apareció en África hace aproximadamente 0,3 millones de años y es la única especie humana que vive en la actualidad. Su cráneo es alto y globular, con frente vertical, cara retraída bajo el neurocráneo y mentón. A diferencia de los neandertales, no presenta un torus supraorbitario marcado. En el tablero puede representarse con tecnología especializada, herramientas de piedra, hueso o asta, arte y símbolos. La idea principal es que Homo sapiens no es el final perfecto de una carrera evolutiva, sino una rama más de la evolución humana que logró expandirse por todo el mundo.",
     textoFacil: "Homo sapiens es nuestra especie. Apareció en África hace unos 300.000 años. Tiene cráneo alto y redondeado, frente vertical y mentón. Se extendió por todo el mundo y desarrolló tecnología, arte y símbolos.",
@@ -1083,307 +136,395 @@ const hominidos = [
   }
 ];
 
-    let indiceActual = 0;
-    let utteranceActual = null;
-    let velocidadAudio = 0.88;
-    let vocesDisponibles = [];
-    let vozSeleccionada = null;
+let indiceActual = 0;
+let lecturaFacilActiva = false;
+let velocidadLentaActiva = false;
+let vocesDisponibles = [];
 
-    const selector = document.getElementById("selector");
-    const tablaResumen = document.getElementById("tablaResumen");
+const $ = (id) => document.getElementById(id);
 
-    function crearSelector() {
-      selector.innerHTML = "";
-      hominidos.forEach((h, i) => {
-        const btn = document.createElement("button");
-        btn.className = "tarjeta-btn";
-        btn.type = "button";
-        btn.style.borderLeftColor = h.color;
-        btn.innerHTML = `<strong>${h.nombre}</strong><span>${h.cronologia} · ${h.lugar}</span>`;
-        btn.addEventListener("click", () => mostrarHominido(i));
-        selector.appendChild(btn);
-      });
-    }
+const elementos = {
+  selector: $("selector"),
+  panelCabecera: $("panelCabecera"),
+  nombre: $("nombre"),
+  descripcionCorta: $("descripcionCorta"),
+  cronologia: $("cronologia"),
+  lugar: $("lugar"),
+  idea: $("idea"),
+  imagenCraneo: $("imagenCraneo"),
+  captionCraneo: $("captionCraneo"),
+  descripcionTactil: $("descripcionTactil"),
+  claves: $("claves"),
+  capacidadCraneal: $("capacidadCraneal"),
+  rasgosClave: $("rasgosClave"),
+  curiosidad: $("curiosidad"),
+  textoAudio: $("textoAudio"),
+  textoFacil: $("textoFacil"),
+  pregunta: $("pregunta"),
+  respuesta: $("respuesta"),
+  tablaResumen: $("tablaResumen"),
+  anteriorBtn: $("anteriorBtn"),
+  siguienteBtn: $("siguienteBtn"),
+  escucharBtn: $("escucharBtn"),
+  pausarBtn: $("pausarBtn"),
+  pararBtn: $("pararBtn"),
+  estadoAudio: $("estadoAudio"),
+  lecturaFacilBtn: $("lecturaFacilBtn"),
+  letraGrandeBtn: $("letraGrandeBtn"),
+  contrasteBtn: $("contrasteBtn"),
+  velocidadNormalBtn: $("velocidadNormalBtn"),
+  velocidadLentaBtn: $("velocidadLentaBtn"),
+  selectorVoz: $("selectorVoz"),
+  iconoCapacidad: $("iconoCapacidad"),
+  iconoRasgos: $("iconoRasgos"),
+  iconoCuriosidad: $("iconoCuriosidad")
+};
 
-    function crearTabla() {
-      tablaResumen.innerHTML = "";
-      hominidos.forEach((h) => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td><span class="color-pill" style="background:${h.color}"></span><strong>${h.nombre}</strong></td>
-          <td>${h.cronologia}</td>
-          <td>${h.lugar}</td>
-          <td>${h.descripcionCorta}</td>
-        `;
-        tablaResumen.appendChild(fila);
-      });
-    }
+function colorTextoSobreFondo(hex) {
+  const limpio = hex.replace("#", "");
+  const r = parseInt(limpio.substring(0, 2), 16);
+  const g = parseInt(limpio.substring(2, 4), 16);
+  const b = parseInt(limpio.substring(4, 6), 16);
+  const brillo = (r * 299 + g * 587 + b * 114) / 1000;
+  return brillo > 150 ? "#111111" : "#ffffff";
+}
 
-    function actualizarEstadoAudio(texto) {
-      const estado = document.getElementById("estadoAudio");
-      if (estado) estado.textContent = texto;
-    }
+function crearImagenFallback(hominido) {
+  const textoColor = colorTextoSobreFondo(hominido.color);
 
-    function actualizarBotonPausa() {
-      const boton = document.getElementById("pausarBtn");
-      if (!boton) return;
-      if ("speechSynthesis" in window && speechSynthesis.paused) {
-        boton.textContent = "▶️ Reanudar";
-      } else {
-        boton.textContent = "⏸ Pausar";
-      }
-    }
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620">
+      <rect width="900" height="620" rx="36" fill="#fff8ed"/>
+      <rect x="28" y="28" width="844" height="564" rx="34" fill="${hominido.color}" opacity="0.20"/>
+      <g transform="translate(225 95)">
+        <ellipse cx="230" cy="155" rx="145" ry="120" fill="#eadcc5" stroke="#2b2118" stroke-width="12"/>
+        <path d="M145 214 C165 330 300 342 330 245 C300 276 238 284 184 260 C168 252 155 238 145 214Z" fill="#eadcc5" stroke="#2b2118" stroke-width="12"/>
+        <circle cx="185" cy="165" r="38" fill="#2b2118"/>
+        <circle cx="280" cy="165" r="38" fill="#2b2118"/>
+        <path d="M232 190 L210 245 L254 245 Z" fill="#2b2118"/>
+        <path d="M175 298 H302" stroke="#2b2118" stroke-width="10" stroke-linecap="round"/>
+        <path d="M190 295 V322 M220 295 V325 M250 295 V325 M280 295 V320" stroke="#2b2118" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <rect x="90" y="470" width="720" height="74" rx="20" fill="${hominido.color}"/>
+      <text x="450" y="518" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="900" fill="${textoColor}">
+        ${hominido.nombre}
+      </text>
+      <text x="450" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#2b2118">
+        Imagen esquemática de apoyo
+      </text>
+    </svg>
+  `;
 
-    function detenerAudio() {
-      if ("speechSynthesis" in window) speechSynthesis.cancel();
-      utteranceActual = null;
-      actualizarEstadoAudio("Audio detenido");
-      actualizarBotonPausa();
-    }
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
 
-    function mostrarHominido(indice) {
-      detenerAudio();
-      indiceActual = indice;
-      const h = hominidos[indice];
+function inicializarSelector() {
+  elementos.selector.innerHTML = "";
 
-      document.getElementById("panelCabecera").style.background = h.color;
-      document.getElementById("preguntaBloque").style.color = h.color;
-      document.getElementById("nombre").textContent = h.nombre;
-      document.getElementById("descripcionCorta").textContent = h.descripcionCorta;
-      document.getElementById("cronologia").textContent = h.cronologia;
-      document.getElementById("lugar").textContent = h.lugar;
-      document.getElementById("idea").textContent = h.idea;
-      document.getElementById("textoAudio").textContent = h.textoAudio;
-      document.getElementById("imagenCraneo").src = h.imagen;
-      document.getElementById("imagenCraneo").alt = h.imagenAlt;
-      document.getElementById("tituloCraneo").textContent = "Cráneo 3D: " + h.nombre;
-      document.getElementById("captionCraneo").textContent = h.captionCraneo;
-      document.getElementById("capacidadCraneal").textContent = h.capacidadCraneal;
-      document.getElementById("rasgosClave").textContent = h.rasgosClave;
-      document.getElementById("curiosidad").textContent = h.curiosidad;
-      document.getElementById("iconoCapacidad").style.background = h.color;
-      document.getElementById("iconoRasgos").style.background = h.color;
-      document.getElementById("iconoCuriosidad").style.background = h.color;
-      document.getElementById("pregunta").textContent = h.pregunta;
-      document.getElementById("respuesta").textContent = "Respuesta: " + h.respuesta;
+  hominidos.forEach((hominido, index) => {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "tarjeta-btn";
+    boton.style.borderLeftColor = hominido.color;
+    boton.setAttribute("aria-label", `Ver ficha de ${hominido.nombre}`);
 
-      const claves = document.getElementById("claves");
-      claves.innerHTML = "";
-      h.claves.forEach((clave) => {
-        const li = document.createElement("li");
-        li.textContent = clave;
-        claves.appendChild(li);
-      });
+    boton.innerHTML = `
+      <strong>${hominido.nombre}</strong>
+      <span>${hominido.cronologia} · ${hominido.idea}</span>
+    `;
 
-      [...selector.children].forEach((btn, i) => btn.classList.toggle("activa", i === indice));
-      actualizarEstadoAudio("Audio detenido");
-      actualizarBotonPausa();
-    }
-
-    function prepararTexto(tipo) {
-      const h = hominidos[indiceActual];
-
-      if (tipo === "datos") {
-        return "Datos clave de " + h.nombre + ". " + h.claves.join(". ") + ".";
-      }
-
-      if (tipo === "capacidad") {
-        return h.nombre + ". Capacidad craneal: " + h.capacidadCraneal;
-      }
-
-      if (tipo === "rasgos") {
-        return h.nombre + ". Rasgos clave: " + h.rasgosClave;
-      }
-
-      if (tipo === "curiosidad") {
-        return h.nombre + ". Dato curioso: " + h.curiosidad;
-      }
-
-      if (tipo === "pregunta") {
-        return h.pregunta + " Respuesta: " + h.respuesta;
-      }
-
-      if (tipo === "craneo") {
-        return h.nombre + ". " + (h.captionCraneo || h.descripcionCorta);
-      }
-
-      if (tipo === "tactil") {
-        return h.nombre + ". Descripción táctil del cráneo. " + h.descripcionTactil;
-      }
-
-      if (document.body.classList.contains("modo-facil")) {
-        return h.textoFacil;
-      }
-
-      return h.textoAudio;
-    }
-
-    function escucharTexto(texto, etiqueta = "Audio en reproducción") {
-      if (!("speechSynthesis" in window)) {
-        alert("Este navegador no permite lectura por voz automática. Puedes leer el texto en pantalla.");
-        return;
-      }
-
-      detenerAudio();
-
-      utteranceActual = new SpeechSynthesisUtterance(texto);
-      utteranceActual.lang = "es-ES";
-      utteranceActual.rate = velocidadAudio;
-      utteranceActual.pitch = 0.98;
-      utteranceActual.volume = 1;
-
-      if (vozSeleccionada) {
-        utteranceActual.voice = vozSeleccionada;
-        utteranceActual.lang = vozSeleccionada.lang || "es-ES";
-      }
-
-      utteranceActual.onstart = () => {
-        actualizarEstadoAudio(etiqueta);
-        actualizarBotonPausa();
-      };
-
-      utteranceActual.onend = () => {
-        actualizarEstadoAudio("Audio terminado");
-        actualizarBotonPausa();
-      };
-
-      utteranceActual.onerror = () => {
-        actualizarEstadoAudio("Audio detenido");
-        actualizarBotonPausa();
-      };
-
-      speechSynthesis.speak(utteranceActual);
-    }
-
-    function escucharActual() {
-      escucharTexto(prepararTexto("texto"), "Escuchando texto completo");
-    }
-
-    document.getElementById("escucharBtn").addEventListener("click", escucharActual);
-
-    document.getElementById("pausarBtn").addEventListener("click", () => {
-      if (!("speechSynthesis" in window)) return;
-
-      if (speechSynthesis.speaking && !speechSynthesis.paused) {
-        speechSynthesis.pause();
-        actualizarEstadoAudio("Audio pausado");
-      } else if (speechSynthesis.paused) {
-        speechSynthesis.resume();
-        actualizarEstadoAudio("Audio reanudado");
-      }
-
-      actualizarBotonPausa();
+    boton.addEventListener("click", () => {
+      indiceActual = index;
+      pararAudio();
+      actualizarFicha();
     });
 
-    document.getElementById("pararBtn").addEventListener("click", detenerAudio);
+    elementos.selector.appendChild(boton);
+  });
+}
 
-    document.querySelectorAll("[data-audio]").forEach((boton) => {
-      boton.addEventListener("click", () => {
-        const tipo = boton.getAttribute("data-audio");
-        const etiqueta = tipo === "datos" ? "Escuchando datos clave"
-          : tipo === "pregunta" ? "Escuchando pregunta"
-          : tipo === "craneo" ? "Escuchando cráneo"
-          : tipo === "tactil" ? "Escuchando descripción táctil"
-          : "Escuchando dato";
-        escucharTexto(prepararTexto(tipo), etiqueta);
-      });
+function actualizarSelectorActivo() {
+  const botones = elementos.selector.querySelectorAll(".tarjeta-btn");
+
+  botones.forEach((boton, index) => {
+    const activo = index === indiceActual;
+    boton.classList.toggle("activa", activo);
+    boton.setAttribute("aria-current", activo ? "true" : "false");
+  });
+}
+
+function actualizarFicha() {
+  const hominido = hominidos[indiceActual];
+  const textoCabecera = colorTextoSobreFondo(hominido.color);
+
+  elementos.panelCabecera.style.background = hominido.color;
+  elementos.panelCabecera.style.color = textoCabecera;
+
+  elementos.nombre.textContent = hominido.nombre;
+  elementos.descripcionCorta.textContent = hominido.descripcionCorta;
+  elementos.cronologia.textContent = hominido.cronologia;
+  elementos.lugar.textContent = hominido.lugar;
+  elementos.idea.textContent = hominido.idea;
+
+  elementos.imagenCraneo.src = hominido.imagen;
+  elementos.imagenCraneo.alt = hominido.imagenAlt;
+  elementos.imagenCraneo.onerror = () => {
+    elementos.imagenCraneo.onerror = null;
+    elementos.imagenCraneo.src = crearImagenFallback(hominido);
+  };
+
+  elementos.captionCraneo.textContent = hominido.captionCraneo;
+  elementos.descripcionTactil.textContent = hominido.descripcionTactil;
+  elementos.capacidadCraneal.textContent = hominido.capacidadCraneal;
+  elementos.rasgosClave.textContent = hominido.rasgosClave;
+  elementos.curiosidad.textContent = hominido.curiosidad;
+  elementos.textoAudio.textContent = hominido.textoAudio;
+  elementos.textoFacil.textContent = hominido.textoFacil;
+  elementos.pregunta.textContent = hominido.pregunta;
+  elementos.respuesta.textContent = hominido.respuesta;
+
+  elementos.iconoCapacidad.textContent = "🧠";
+  elementos.iconoCapacidad.style.background = hominido.color;
+  elementos.iconoCapacidad.style.color = textoCabecera;
+
+  elementos.iconoRasgos.textContent = "✋";
+  elementos.iconoRasgos.style.background = hominido.color;
+  elementos.iconoRasgos.style.color = textoCabecera;
+
+  elementos.iconoCuriosidad.textContent = "✨";
+  elementos.iconoCuriosidad.style.background = hominido.color;
+  elementos.iconoCuriosidad.style.color = textoCabecera;
+
+  elementos.claves.innerHTML = "";
+  hominido.claves.forEach((clave) => {
+    const li = document.createElement("li");
+    li.textContent = clave;
+    elementos.claves.appendChild(li);
+  });
+
+  actualizarSelectorActivo();
+}
+
+function crearTablaResumen() {
+  elementos.tablaResumen.innerHTML = "";
+
+  hominidos.forEach((hominido) => {
+    const fila = document.createElement("tr");
+
+    const celdaNombre = document.createElement("td");
+    celdaNombre.innerHTML = `
+      <span class="color-pill" style="background:${hominido.color}"></span>
+      <strong>${hominido.nombre}</strong>
+    `;
+
+    const celdaCronologia = document.createElement("td");
+    celdaCronologia.textContent = hominido.cronologia;
+
+    const celdaLugar = document.createElement("td");
+    celdaLugar.textContent = hominido.lugar;
+
+    const celdaIdea = document.createElement("td");
+    celdaIdea.textContent = hominido.ideaResumen;
+
+    fila.appendChild(celdaNombre);
+    fila.appendChild(celdaCronologia);
+    fila.appendChild(celdaLugar);
+    fila.appendChild(celdaIdea);
+
+    elementos.tablaResumen.appendChild(fila);
+  });
+}
+
+function obtenerTextoParaAudio(tipo) {
+  const hominido = hominidos[indiceActual];
+
+  const textos = {
+    craneo: hominido.captionCraneo,
+    tactil: hominido.descripcionTactil,
+    datos: hominido.claves.join(". "),
+    capacidad: `Capacidad craneal: ${hominido.capacidadCraneal}`,
+    rasgos: hominido.rasgosClave,
+    curiosidad: hominido.curiosidad,
+    pregunta: `${hominido.pregunta} ${hominido.respuesta}`,
+    completo: lecturaFacilActiva ? hominido.textoFacil : hominido.textoAudio
+  };
+
+  return textos[tipo] || textos.completo;
+}
+
+function cargarVoces() {
+  if (!("speechSynthesis" in window)) return;
+
+  vocesDisponibles = window.speechSynthesis.getVoices();
+
+  elementos.selectorVoz.innerHTML = `<option value="">Voz automática</option>`;
+
+  vocesDisponibles
+    .filter((voz) => voz.lang.toLowerCase().startsWith("es"))
+    .forEach((voz, index) => {
+      const option = document.createElement("option");
+      option.value = voz.name;
+      option.textContent = `${voz.name} · ${voz.lang}`;
+      elementos.selectorVoz.appendChild(option);
     });
+}
 
-    document.getElementById("anteriorBtn").addEventListener("click", () => {
-      mostrarHominido((indiceActual - 1 + hominidos.length) % hominidos.length);
+function obtenerVozSeleccionada() {
+  if (!("speechSynthesis" in window)) return null;
+
+  const nombreVoz = elementos.selectorVoz.value;
+
+  if (nombreVoz) {
+    return vocesDisponibles.find((voz) => voz.name === nombreVoz) || null;
+  }
+
+  return (
+    vocesDisponibles.find((voz) => voz.lang === "es-ES") ||
+    vocesDisponibles.find((voz) => voz.lang.toLowerCase().startsWith("es")) ||
+    null
+  );
+}
+
+function hablar(tipo = "completo") {
+  if (!("speechSynthesis" in window)) {
+    elementos.estadoAudio.textContent = "Audio no disponible en este navegador";
+    return;
+  }
+
+  pararAudio();
+
+  const texto = obtenerTextoParaAudio(tipo);
+  const utterance = new SpeechSynthesisUtterance(texto);
+
+  utterance.lang = "es-ES";
+  utterance.rate = velocidadLentaActiva ? 0.78 : 0.98;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  const voz = obtenerVozSeleccionada();
+  if (voz) utterance.voice = voz;
+
+  utterance.onstart = () => {
+    elementos.estadoAudio.textContent = "Audio reproduciéndose";
+    elementos.pausarBtn.textContent = "⏸ Pausar";
+  };
+
+  utterance.onend = () => {
+    elementos.estadoAudio.textContent = "Audio detenido";
+    elementos.pausarBtn.textContent = "⏸ Pausar";
+  };
+
+  utterance.onerror = () => {
+    elementos.estadoAudio.textContent = "No se pudo reproducir el audio";
+    elementos.pausarBtn.textContent = "⏸ Pausar";
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function pausarOReanudarAudio() {
+  if (!("speechSynthesis" in window)) return;
+
+  if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+    window.speechSynthesis.pause();
+    elementos.estadoAudio.textContent = "Audio pausado";
+    elementos.pausarBtn.textContent = "▶ Reanudar";
+    return;
+  }
+
+  if (window.speechSynthesis.paused) {
+    window.speechSynthesis.resume();
+    elementos.estadoAudio.textContent = "Audio reproduciéndose";
+    elementos.pausarBtn.textContent = "⏸ Pausar";
+  }
+}
+
+function pararAudio() {
+  if (!("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+  elementos.estadoAudio.textContent = "Audio detenido";
+  elementos.pausarBtn.textContent = "⏸ Pausar";
+}
+
+function activarLecturaFacil() {
+  lecturaFacilActiva = !lecturaFacilActiva;
+  document.body.classList.toggle("modo-facil", lecturaFacilActiva);
+  elementos.lecturaFacilBtn.classList.toggle("activo", lecturaFacilActiva);
+  pararAudio();
+}
+
+function activarLetraGrande() {
+  document.body.classList.toggle("letra-grande");
+  elementos.letraGrandeBtn.classList.toggle("activo");
+}
+
+function activarContraste() {
+  document.body.classList.toggle("alto-contraste");
+  elementos.contrasteBtn.classList.toggle("activo");
+}
+
+function cambiarVelocidad(lenta) {
+  velocidadLentaActiva = lenta;
+
+  elementos.velocidadNormalBtn.classList.toggle("activo", !lenta);
+  elementos.velocidadLentaBtn.classList.toggle("activo", lenta);
+
+  pararAudio();
+}
+
+function irAnterior() {
+  indiceActual = (indiceActual - 1 + hominidos.length) % hominidos.length;
+  pararAudio();
+  actualizarFicha();
+}
+
+function irSiguiente() {
+  indiceActual = (indiceActual + 1) % hominidos.length;
+  pararAudio();
+  actualizarFicha();
+}
+
+function asignarEventos() {
+  elementos.anteriorBtn.addEventListener("click", irAnterior);
+  elementos.siguienteBtn.addEventListener("click", irSiguiente);
+
+  elementos.escucharBtn.addEventListener("click", () => hablar("completo"));
+  elementos.pausarBtn.addEventListener("click", pausarOReanudarAudio);
+  elementos.pararBtn.addEventListener("click", pararAudio);
+
+  elementos.lecturaFacilBtn.addEventListener("click", activarLecturaFacil);
+  elementos.letraGrandeBtn.addEventListener("click", activarLetraGrande);
+  elementos.contrasteBtn.addEventListener("click", activarContraste);
+
+  elementos.velocidadNormalBtn.addEventListener("click", () => cambiarVelocidad(false));
+  elementos.velocidadLentaBtn.addEventListener("click", () => cambiarVelocidad(true));
+
+  document.querySelectorAll("[data-audio]").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      const tipo = boton.getAttribute("data-audio");
+      hablar(tipo);
     });
+  });
 
-    document.getElementById("siguienteBtn").addEventListener("click", () => {
-      mostrarHominido((indiceActual + 1) % hominidos.length);
-    });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") irAnterior();
+    if (event.key === "ArrowRight") irSiguiente();
+    if (event.key === "Escape") pararAudio();
+  });
 
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = cargarVoces;
+  }
+}
 
+function iniciarWeb() {
+  inicializarSelector();
+  crearTablaResumen();
+  cargarVoces();
+  asignarEventos();
+  actualizarFicha();
+}
 
-    function cargarVoces() {
-      if (!("speechSynthesis" in window)) return;
-
-      vocesDisponibles = speechSynthesis.getVoices() || [];
-      const selectorVoz = document.getElementById("selectorVoz");
-      if (!selectorVoz) return;
-
-      const valorActual = selectorVoz.value;
-      selectorVoz.innerHTML = '<option value="">Voz automática</option>';
-
-      const vocesEspanol = vocesDisponibles.filter((voz) =>
-        (voz.lang || "").toLowerCase().startsWith("es")
-      );
-
-      const vocesParaMostrar = vocesEspanol.length ? vocesEspanol : vocesDisponibles;
-
-      vocesParaMostrar.forEach((voz) => {
-        const option = document.createElement("option");
-        option.value = voz.name;
-        option.textContent = voz.name + " (" + voz.lang + ")";
-        selectorVoz.appendChild(option);
-      });
-
-      const vozPreferida = vocesEspanol.find((voz) =>
-        /premium|enhanced|natural|mónica|monica|lucia|lucía|paulina|google español|spanish/i.test(voz.name)
-      ) || vocesEspanol[0];
-
-      if (!valorActual && vozPreferida) {
-        selectorVoz.value = vozPreferida.name;
-        vozSeleccionada = vozPreferida;
-      } else if (valorActual) {
-        vozSeleccionada = vocesDisponibles.find((voz) => voz.name === valorActual) || vozPreferida || null;
-        selectorVoz.value = vozSeleccionada ? vozSeleccionada.name : "";
-      }
-    }
-
-    if ("speechSynthesis" in window) {
-      cargarVoces();
-      speechSynthesis.onvoiceschanged = cargarVoces;
-    }
-
-    document.getElementById("selectorVoz").addEventListener("change", (event) => {
-      const nombre = event.target.value;
-      vozSeleccionada = vocesDisponibles.find((voz) => voz.name === nombre) || null;
-      detenerAudio();
-    });
-
-    document.getElementById("lecturaFacilBtn").addEventListener("click", () => {
-      document.body.classList.toggle("modo-facil");
-      const activo = document.body.classList.contains("modo-facil");
-      document.getElementById("lecturaFacilBtn").classList.toggle("activo", activo);
-      detenerAudio();
-    });
-
-    document.getElementById("letraGrandeBtn").addEventListener("click", () => {
-      document.body.classList.toggle("letra-grande");
-      const activo = document.body.classList.contains("letra-grande");
-      document.getElementById("letraGrandeBtn").classList.toggle("activo", activo);
-    });
-
-    document.getElementById("contrasteBtn").addEventListener("click", () => {
-      document.body.classList.toggle("alto-contraste");
-      const activo = document.body.classList.contains("alto-contraste");
-      document.getElementById("contrasteBtn").classList.toggle("activo", activo);
-    });
-
-    document.getElementById("velocidadNormalBtn").addEventListener("click", () => {
-      velocidadAudio = 0.88;
-      document.getElementById("velocidadNormalBtn").classList.add("activo");
-      document.getElementById("velocidadLentaBtn").classList.remove("activo");
-      detenerAudio();
-    });
-
-    document.getElementById("velocidadLentaBtn").addEventListener("click", () => {
-      velocidadAudio = 0.75;
-      document.getElementById("velocidadLentaBtn").classList.add("activo");
-      document.getElementById("velocidadNormalBtn").classList.remove("activo");
-      detenerAudio();
-    });
-
-    window.addEventListener("beforeunload", detenerAudio);
-
-    crearSelector();
-    crearTabla();
-    mostrarHominido(0);
-  </script>
-</body>
-</html>
+document.addEventListener("DOMContentLoaded", iniciarWeb);
+</script>
